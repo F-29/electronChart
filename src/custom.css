@@ -1,0 +1,34 @@
+* {
+    background-color: #1c2d43;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.btn_save {
+    text-align: center;
+    margin-top: 0;
+    padding-bottom: 18px;
+}
+
+#save {
+    border: 0;
+    border-radius: 15px;
+    color: #d9d9d8;
+    background-color: #bc16e9;
+    font-size: 16px;
+    padding: 13px 22px;
+}
+
+#save:hover {
+    background-color: #ffffff;
+    color: #1c2d43;
+    cursor: pointer;
+}

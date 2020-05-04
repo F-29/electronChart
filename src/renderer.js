@@ -25,8 +25,6 @@ const updateValue = () => {
         } else {
             dataset.data = dataHeader();
             dataset.value = median(toMedian);
-            console.log("value:", dataset.data);
-            console.log("toMedian:", toMedian);
             toMedian = [];
         }
     });
@@ -52,14 +50,12 @@ SerialPort.list().then((ports) => {
         const port = new SerialPort(serial, {
             baudRate: 9600,
         });
-        // const parser = new SerialPort.parsers.Readline("/r/n");
         const parser = port.pipe(new SerialPort.parsers.Readline({delimiter: '\r\n'}));
-        parser.on('data', (new_value) => {
+        parser.on('data', new_value => {
             value = parseInt(new_value);
             updateValue();
         });
     } else {
-        console.log("no Device Connected...");
         document.getElementById('no-arduino-wrapper').style.marginTop = "85px";
         document.getElementById('no-arduino').innerHTML = "<span style='color: #e0e0e0'>No Device is Connected.</span>";
         document.getElementById('canvas-holder').innerHTML = "<p style=\"text-align: center; font-size: 17px; color: #bebebe\">No Chart for No Data ;D</p>";
@@ -126,4 +122,5 @@ window.onload = () => {
     let ctx = document.getElementById('chart').getContext('2d');
     window.myGauge = new Chart(ctx, config);
     updateValue();
+    // TODO: check whether dataHeader() can be called only once(in this block)
 };

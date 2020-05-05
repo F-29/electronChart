@@ -1,13 +1,14 @@
 {
   "name": "baba_project_7",
-  "productName": "baba_project_7",
+  "productName": "Visualizer",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "a Serial Data Visualizer",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make-32": "electron-forge make --arch=ia32",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },

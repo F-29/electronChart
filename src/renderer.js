@@ -45,9 +45,14 @@ median = (values) => {
 }
 
 SerialPort.list().then((ports) => {
-    if (ports.length) {
-        let serial = ports[0]['path'];
-        const port = new SerialPort(serial, {
+    let serialPort = "";
+    ports.forEach(port => {
+        if (port['manufacturer'] === "wch.cn") {
+            serialPort = port['path'];
+        }
+    });
+    if (serialPort.length) {
+        const port = new SerialPort(serialPort, {
             baudRate: 9600,
         });
         const parser = port.pipe(new SerialPort.parsers.Readline({delimiter: '\r\n'}));
@@ -56,9 +61,15 @@ SerialPort.list().then((ports) => {
             updateValue();
         });
     } else {
+        //region no Device Connected Message
         document.getElementById('no-arduino-wrapper').style.marginTop = "85px";
         document.getElementById('no-arduino').innerHTML = "<span style='color: #e0e0e0'>No Device is Connected.</span>";
-        document.getElementById('canvas-holder').innerHTML = "<p style=\"text-align: center; font-size: 17px; color: #bebebe\">No Chart for No Data ;D</p>";
+        document.getElementById('canvas-holder')
+            .innerHTML = "<p style=\"margin-top: 15px; text-align: center; font-size: 17px; color: #bebebe\">" +
+            "No Data No Chart ;D</p>" +
+            "<p style=\"margin-top: 145px; text-align: center; color: #e2e2e2; font-size: 25px; margin-right: 15px;\">Connect the Device and Refresh" +
+            "  <b><code style='padding: 9px; background-color: #3a617c; border-radius: 15px; color: #c5dbff'>Ctrl + R</code></b></p>";
+        //endregion
     }
 });
 

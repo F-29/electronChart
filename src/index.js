@@ -1,33 +1,37 @@
-const {app, BrowserWindow} = require('electron');
+const electron = require('electron');
 const path = require('path');
+const globalShortcut = electron.globalShortcut;
 
 if (require('electron-squirrel-startup')) {
-    app.quit();
+    electron.app.quit();
 }
 
 const createWindow = () => {
-    const mainWindow = new BrowserWindow({
+    const mainWindow = new electron.BrowserWindow({
         width: 1200,
         height: 800,
         webPreferences: {
             nodeIntegration: true
         }
     });
-
+    globalShortcut.register('CommandOrControl+R', () => {
+        mainWindow.reload();
+    })
+    mainWindow.setMenu(null);
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
 };
 
-app.on('ready', createWindow);
+electron.app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
+electron.app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit();
+        electron.app.quit();
     }
 });
 
-app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
+electron.app.on('activate', () => {
+    if (electron.BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
 });

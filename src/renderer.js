@@ -1,6 +1,9 @@
 const SerialPort = require("serialport");
-
-let toMedian = [];
+const csvParser = require("csv-parser");
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const {remote} = require('electron');
+const dialog = remote.dialog;
+const WIN = remote.getCurrentWindow();
 
 const dataHeader = () => {
     return [
@@ -14,6 +17,22 @@ const dataHeader = () => {
 
 const data = dataHeader();
 
+const saveDialogOptions = {
+    title: "Visualizer - Save received data in CSV",
+
+    defaultPath: "Desktop",
+
+    buttonLabel: "Save",
+
+    filters: [
+        {name: 'Excel CSV', extensions: ['csv']},
+    ]
+};
+
+let toMedian = [];
+
+let toSaveAsCsv = [];
+
 let value = 0;
 
 
@@ -23,7 +42,6 @@ const updateValue = () => {
         if (toMedian.length < 5) {
             toMedian = toMedian.concat([value]);
         } else {
-            dataset.data = dataHeader();
             dataset.value = median(toMedian);
             toMedian = [];
         }
@@ -58,8 +76,50 @@ SerialPort.list().then((ports) => {
         const parser = port.pipe(new SerialPort.parsers.Readline({delimiter: '\r\n'}));
         parser.on('data', new_value => {
             value = parseInt(new_value);
+            toSaveAsCsv = toSaveAsCsv.concat([new_value]);
             updateValue();
         });
+        document.getElementById("toSave").innerHTML = "<button id='save'>Save</button>";
+        document.getElementById('save').onclick = () => {
+            dialog
+                .showSaveDialog(WIN, saveDialogOptions)
+                .then(results => {
+                    if (!results.canceled) {
+                        const csvWriter = createCsvWriter({
+                            path: results.filePath,
+                            header: [
+                                {id: 'number', title: 'Readings'},
+                            ]
+                        });
+                        let csvObjectList = [];
+                        let csvObject;
+                        for (let i = 0; i < toSaveAsCsv.length; i++) {
+                            csvObject = {number: toSaveAsCsv[i]};
+                            csvObjectList = csvObjectList.concat([csvObject]);
+                        }
+
+                        csvWriter
+                            .writeRecords(csvObjectList)
+                            .then(() => {
+                                setInterval(() => {
+                                    document.getElementById('btn_save').innerHTML =
+                                        "<h2 style='font-size: 32px;\n" +
+                                        "  background: linear-gradient(to right, #540cca, #e53232);\n" +
+                                        "  -webkit-background-clip: text;\n" +
+                                        "  -webkit-text-fill-color: transparent;'>" +
+                                        "Saved!" +
+                                        "</h2>";
+                                }, 5000);
+                                document.getElementById('btn_save').innerHTML = "<span id='toSave'></span>";
+                            });
+                    }
+                })
+                .catch(e => {
+                    alert("Unfortunately There was an Error!");
+                    // alert(e);
+                });
+        };
+
     } else {
         //region no Device Connected Message
         document.getElementById('no-arduino-wrapper').style.marginTop = "85px";
@@ -133,5 +193,4 @@ window.onload = () => {
     let ctx = document.getElementById('chart').getContext('2d');
     window.myGauge = new Chart(ctx, config);
     updateValue();
-    // TODO: check whether dataHeader() can be called only once(in this block)
 };

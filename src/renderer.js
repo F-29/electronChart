@@ -75,7 +75,7 @@ SerialPort.list().then((ports) => {
         const parser = port.pipe(new SerialPort.parsers.Readline({delimiter: '\r\n'}));
         parser.on('data', new_value => {
             value = parseInt(new_value);
-            toSaveAsCsv = toSaveAsCsv.concat([new_value]);
+            toSaveAsCsv = toSaveAsCsv.concat([parseInt((value / 920.5 * 135).toString())]);
             updateValue();
         });
         document.getElementById("toSave").innerHTML = "<button id='save'>Save</button>";
@@ -93,8 +93,10 @@ SerialPort.list().then((ports) => {
                         let csvObjectList = [];
                         let csvObject;
                         for (let i = 0; i < toSaveAsCsv.length; i++) {
-                            csvObject = {number: toSaveAsCsv[i]};
-                            csvObjectList = csvObjectList.concat([csvObject]);
+                            if (!isNaN(toSaveAsCsv[i])) {
+                                csvObject = {number: toSaveAsCsv[i]};
+                                csvObjectList = csvObjectList.concat([csvObject]);
+                            }
                         }
 
                         csvWriter

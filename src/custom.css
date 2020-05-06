@@ -28,7 +28,7 @@ canvas {
 }
 
 #save:hover {
-    background-image: linear-gradient(to left, #540cca, #e53232);
-    color: #d9d9d8;
+    background-image: linear-gradient(to left, #ffffff, #757575);
+    color: #4e4e4e;
     cursor: pointer;
 }

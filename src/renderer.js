@@ -1,5 +1,4 @@
 const SerialPort = require("serialport");
-const csvParser = require("csv-parser");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const {remote} = require('electron');
 const dialog = remote.dialog;
@@ -101,22 +100,21 @@ SerialPort.list().then((ports) => {
                         csvWriter
                             .writeRecords(csvObjectList)
                             .then(() => {
+                                document.getElementById('notification').innerHTML =
+                                    "<div style='font-size: 52px;\n" +
+                                    "  background: linear-gradient(to right, #540cca, #e53232);\n" +
+                                    "  -webkit-background-clip: text;\n" +
+                                    "  -webkit-text-fill-color: transparent;'>" +
+                                    "Saved!" +
+                                    "</div>";
                                 setInterval(() => {
-                                    document.getElementById('btn_save').innerHTML =
-                                        "<h2 style='font-size: 32px;\n" +
-                                        "  background: linear-gradient(to right, #540cca, #e53232);\n" +
-                                        "  -webkit-background-clip: text;\n" +
-                                        "  -webkit-text-fill-color: transparent;'>" +
-                                        "Saved!" +
-                                        "</h2>";
-                                }, 5000);
-                                document.getElementById('btn_save').innerHTML = "<span id='toSave'></span>";
+                                    document.getElementById('notification').innerHTML = "";
+                                }, 3500);
                             });
                     }
                 })
                 .catch(e => {
                     alert("Unfortunately There was an Error!");
-                    // alert(e);
                 });
         };
 

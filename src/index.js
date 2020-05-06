@@ -23,7 +23,7 @@ const createWindow = () => {
 };
 
 electron.app.on('ready', createWindow);
-
+electron.app.allowRendererProcessReuse = false;
 electron.app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         electron.app.quit();

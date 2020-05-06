@@ -98,7 +98,7 @@ SerialPort.list().then((ports) => {
                                 csvObjectList = csvObjectList.concat([csvObject]);
                             }
                         }
-
+                        toSaveAsCsv = [];
                         csvWriter
                             .writeRecords(csvObjectList)
                             .then(() => {

@@ -2,7 +2,7 @@
   "name": "baba_project_7",
   "productName": "Visualizer",
   "version": "1.0.0",
-  "description": "a Serial Data Visualizer",
+  "description": "Serial Data Visualizer",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",

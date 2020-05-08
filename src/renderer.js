@@ -34,6 +34,9 @@ let toSaveAsCsv = [];
 
 let value = 0;
 
+let recordState = false;
+
+let savePath = '';
 
 const updateValue = () => {
     value = parseInt((value / 920.5 * 135).toString());
@@ -75,49 +78,65 @@ SerialPort.list().then((ports) => {
         const parser = port.pipe(new SerialPort.parsers.Readline({delimiter: '\r\n'}));
         parser.on('data', new_value => {
             value = parseInt(new_value);
-            toSaveAsCsv = toSaveAsCsv.concat([parseInt((value / 920.5 * 135).toString())]);
+            if (recordState) {
+                toSaveAsCsv = toSaveAsCsv.concat([parseInt((value / 920.5 * 135).toString())]);
+            }
             updateValue();
         });
-        document.getElementById("toSave").innerHTML = "<button id='save'>Save</button>";
-        document.getElementById('save').onclick = () => {
-            dialog
-                .showSaveDialog(WIN, saveDialogOptions)
-                .then(results => {
-                    if (!results.canceled) {
-                        const csvWriter = createCsvWriter({
-                            path: results.filePath,
-                            header: [
-                                {id: 'number', title: 'Readings'},
-                            ]
-                        });
-                        let csvObjectList = [];
-                        let csvObject;
-                        for (let i = 0; i < toSaveAsCsv.length; i++) {
-                            if (!isNaN(toSaveAsCsv[i])) {
-                                csvObject = {number: toSaveAsCsv[i]};
-                                csvObjectList = csvObjectList.concat([csvObject]);
-                            }
-                        }
-                        toSaveAsCsv = [];
-                        csvWriter
-                            .writeRecords(csvObjectList)
-                            .then(() => {
-                                document.getElementById('notification').innerHTML =
-                                    "<div style='font-size: 52px;\n" +
-                                    "  background: linear-gradient(to right, #540cca, #e53232);\n" +
-                                    "  -webkit-background-clip: text;\n" +
-                                    "  -webkit-text-fill-color: transparent;'>" +
-                                    "Saved!" +
-                                    "</div>";
-                                setInterval(() => {
-                                    document.getElementById('notification').innerHTML = "";
-                                }, 3500);
-                            });
-                    }
-                })
-                .catch(e => {
-                    alert("Unfortunately There was an Error!");
+        document.getElementById("toSave").innerHTML = "<button id='Record'>Start to Record</button>";
+
+        document.getElementById('Record').onclick = () => {
+            if (recordState) {
+                console.log("ddd");
+                const csvWriter = createCsvWriter({
+                    path: savePath,
+                    header: [
+                        {id: 'number', title: 'Readings'},
+                    ]
                 });
+                let csvObjectList = [];
+                let csvObject;
+                for (let i = 0; i < toSaveAsCsv.length; i++) {
+                    if (!isNaN(toSaveAsCsv[i])) {
+                        csvObject = {number: toSaveAsCsv[i]};
+                        csvObjectList = csvObjectList.concat([csvObject]);
+                    }
+                }
+                toSaveAsCsv = [];
+                csvWriter
+                    .writeRecords(csvObjectList)
+                    .then(() => {
+                        recordState = false;
+                        document.getElementById("Record").innerText = "Start to Record";
+                        document.getElementById('notification').innerHTML =
+                            "<div style='font-size: 52px;\n" +
+                            "  background: linear-gradient(to right, #540cca, #e53232);\n" +
+                            "  -webkit-background-clip: text;\n" +
+                            "  -webkit-text-fill-color: transparent;'>" +
+                            "Saved!" +
+                            "</div>";
+                        setInterval(() => {
+                            document.getElementById('notification').innerHTML = "";
+                        }, 3500);
+                    });
+            } else {
+                recordState = true;
+                dialog
+                    .showSaveDialog(WIN, saveDialogOptions)
+                    .then(results => {
+                        if (!results.canceled) {
+                            savePath = results.filePath;
+                            document.getElementById("Record").innerText = "Save";
+                        }
+                    })
+                    .catch(e => {
+                        alert("Unfortunately There was an Error!");
+                    });
+            }
+        };
+
+        document.getElementById('endAndSaveRecord').onclick = () => {
+
         };
 
     } else {
